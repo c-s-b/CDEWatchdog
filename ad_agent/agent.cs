@@ -1179,18 +1179,18 @@ namespace ADWatchdogAgent
             <div class=""terminal-box"" id=""terminal-content""></div>
         </div>
 
-        <div class=""score-card good"" id=""score-card"">
+        <div class=""score-card"" id=""score-card"" style=""border: 1px solid var(--border); background: var(--bg-card);"">
             <div style=""font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;"" id=""score-header"">
                 ACTIVE DIRECTORY INTEGRITY HEALTH SCORE
             </div>
-            <div class=""score-headline"" id=""score-val"" style=""color: var(--green-ok);"">
-                100%
+            <div class=""score-headline"" id=""score-val"" style=""color: var(--text-muted);"">
+                --%
             </div>
             <div style=""font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-top: 8px;"" id=""score-title"">
-                GOLDEN STATE COMPLIANT — ALL DEFENSES VERIFIED
+                CONNECTING TO LOCAL AUDIT ENGINE...
             </div>
             <div style=""font-size: 0.9rem; color: #94a3b8; margin-top: 4px;"" id=""score-subtitle"">
-                Zero unauthorized domain accounts • Zero rogue Domain Admins • Firewall & LSA Guard Enforced
+                Awaiting telemetry ingestion from CDE agent runtime...
             </div>
         </div>
 
@@ -1284,10 +1284,16 @@ namespace ADWatchdogAgent
         async function fetchState() {
             try {
                 const res = await fetch('/api/state');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 renderUI(data);
             } catch (err) {
                 console.error(""Failed to fetch state:"", err);
+                document.getElementById('score-card').className = 'score-card bad';
+                document.getElementById('score-val').style.color = 'var(--red-crit)';
+                document.getElementById('score-val').innerText = 'OFFLINE';
+                document.getElementById('score-title').innerText = 'TELEMETRY DISCONNECTED';
+                document.getElementById('score-subtitle').innerText = 'Unable to reach http://127.0.0.1:8000/api/state. Check agent console.';
             }
         }
 
@@ -1409,8 +1415,8 @@ namespace ADWatchdogAgent
             const wl = telemetry.winlogon || {};
             const wlStatus = document.getElementById('winlogon-status');
             const wlDetails = document.getElementById('winlogon-details');
-            const uInit = wl.Userinit || 'C:\Windows\system32\userinit.exe,';
-            const isUInitClean = uInit.toLowerCase() === 'c:\windows\system32\userinit.exe,' || uInit.toLowerCase() === 'c:\windows\system32\userinit.exe';
+            const uInit = wl.Userinit || 'C:\\Windows\\system32\\userinit.exe,';
+            const isUInitClean = uInit.toLowerCase() === 'c:\\windows\\system32\\userinit.exe,' || uInit.toLowerCase() === 'c:\\windows\\system32\\userinit.exe';
             const isShellClean = (wl.Shell || 'explorer.exe').toLowerCase() === 'explorer.exe';
             const hasLogonScript = !!(wl.LogonScript);
 
