@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+
+# C / C++ / C# Compilations
+*.exe
+*.dll
+*.so
+*.dylib
+*.obj
+*.o
+*.pdb
+*.ilk
+bin/
+obj/
+
+# Logs & Temporary files
+*.log
+*.tmp
+*.iso
+.vscode/
+.idea/
+.DS_Store
