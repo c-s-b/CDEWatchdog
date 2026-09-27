@@ -19,17 +19,19 @@ echo   STANDALONE WINDOWS VM: AD WATCHDOG TEST BENCH (NO DC REQUIRED)
 echo ==============================================================================
 echo [1] Inject Contamination (Simulate Minute-0 Breach: Rogue Admin + Disabled FW)
 echo [2] Cleanse System Back to Pristine Golden State
-echo [3] Run Agent in Live Debug Mode (-debug)
+echo [3] Run Agent in Live Debug Mode (-debug + Terminal Triage)
 echo [4] Test Mutual Watchdog Kill-and-Revive (Taskkill Bravo)
-echo [5] Exit
+echo [5] Open Local Web Dashboard in Browser (http://127.0.0.1:8000)
+echo [6] Exit
 echo ==============================================================================
-set /p choice="Enter choice [1-5]: "
+set /p choice="Enter choice [1-6]: "
 
 if "%choice%"=="1" goto CONTAMINATE
 if "%choice%"=="2" goto CLEAN
 if "%choice%"=="3" goto DEBUG_RUN
 if "%choice%"=="4" goto TEST_WATCHDOG
-if "%choice%"=="5" goto EXIT
+if "%choice%"=="5" goto BROWSER
+if "%choice%"=="6" goto EXIT
 goto EXIT
 
 :CONTAMINATE
@@ -103,13 +105,14 @@ goto EXIT
 
 :DEBUG_RUN
 echo.
-set /p srv="Enter Central Server IP (press Enter for 127.0.0.1): "
+set /p srv="Enter Target Central Server IP (press Enter for 127.0.0.1 local): "
 if "%srv%"=="" set srv=127.0.0.1
-echo [*] Launching agent.exe in DEBUG mode targeting http://%srv%:8000/api/ad_triage ...
+echo [*] Launching agent.exe with Local Web Dashboard and Terminal Triage...
 if exist agent.exe (
+    start http://127.0.0.1:8000
     agent.exe -alpha -server %srv% -port 8000 -interval 300 -debug
 ) else (
-    echo [!] agent.exe not found in current folder! Compile it first.
+    echo [!] agent.exe not found in current folder! Run build_executable.bat first.
 )
 pause
 goto EXIT
@@ -128,6 +131,12 @@ if %ERRORLEVEL% EQU 0 (
     echo [!] agent_bravo.exe not found. Make sure agent_alpha.exe is running.
 )
 pause
+goto EXIT
+
+:BROWSER
+echo.
+echo [*] Opening Local Web Dashboard in default browser: http://127.0.0.1:8000 ...
+start http://127.0.0.1:8000
 goto EXIT
 
 :EXIT

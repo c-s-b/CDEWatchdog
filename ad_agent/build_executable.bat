@@ -69,11 +69,11 @@ echo     - agent.exe       (Base Binary - GUI Subsystem / Hidden Background)
 echo     - agent_alpha.exe (Primary Watchdog)
 echo     - agent_bravo.exe (Companion Watchdog)
 echo ==============================================================================
+echo To run with Local Web Dashboard and Terminal Triage:
+echo     agent_alpha.exe -alpha -debug
+echo     Then open your browser to: http://127.0.0.1:8000
 echo.
-echo To launch Alpha targeting the Central Analytical Server:
-echo     agent_alpha.exe -alpha -server ^<SERVER_IP^> -port 8000
-echo.
-echo Or run in terminal debug mode:
-echo     agent_alpha.exe -alpha -server ^<SERVER_IP^> -port 8000 -debug
+echo Or run the interactive standalone test bench:
+echo     test_standalone_vm.bat
 echo.
 pause

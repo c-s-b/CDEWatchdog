@@ -7,19 +7,22 @@ An autonomous, air-gapped Active Directory defense and threat hunting system bui
 ## 🌟 Key Highlights & Innovations
 
 1. **Zero-Dependency Native Windows Agent (C# / C++):**
-   - Compiles directly on any air-gapped Windows Server (2012 R2 through 2022) using the pre-installed native .NET compiler (`csc.exe`). No Visual Studio, SDK, or external package downloads required.
+   - Compiles directly on any air-gapped Windows Server (2012 R2 through 2022) using the pre-installed native .NET compiler (`csc.exe`). No Visual Studio, Python, SDK, or external package downloads required.
    - Dual-language support: native C# (.NET BCL) and native Win32 C++ (`Netapi32.dll`, `Advapi32.dll`, `WinINet.dll`).
-2. **Comprehensive Autostart & Logon Persistence Audit (MITRE ATT&CK):**
+2. **Built-in Local Web Dashboard (Loopback Interface - 127.0.0.1:8000):**
+   - Hosts the full, interactive SOC threat-hunting dashboard directly on the Active Directory machine itself using native `System.Net.HttpListener`.
+   - **Zero Network Transmission Risk:** 100% air-gapped loopback telemetry prevents packet sniffing (**T1040**), remote telemetry tampering, and analyst IP exposure over contest networks.
+   - Features 1-click `[🚨 Purge Rogue Admins & Lock Policies]` panic button, dynamic team whitelist manager, and real-time ATT&CK anomaly tables.
+3. **Simultaneous Live Terminal Triage Output (Always Retained):**
+   - In addition to the local web GUI, the agent outputs a rich, color-coded terminal triage report to PowerShell / Command Prompt on every audit round (5-minute / 300s interval).
+   - Displays the AD Health Score, discovered accounts, rogue domain admins, registry defense posture, autostart persistence keys, and ready-to-paste emergency remediation scripts.
+4. **Comprehensive Autostart & Logon Persistence Audit (MITRE ATT&CK):**
    - Scans system and user `Run` / `RunOnce` keys in 32-bit and 64-bit registry views (**T1547.001**).
    - Audits Winlogon `Userinit` and `Shell` hijacking (**T1547.004**).
    - Detects `UserInitMprLogonScript` and Group Policy logon/logoff script backdoors (**T1037.001**).
    - Built-in virtualization whitelist (`vmtoolsd.exe`, `vboxtray.exe`) prevents false alarms on lab VMs.
-3. **Mutual Dual-Process Watchdog:**
+5. **Mutual Dual-Process Watchdog:**
    - Sibling processes (`agent_alpha` & `agent_bravo`) monitor each other. If a red-team operator kills one via `taskkill`, the surviving companion instantly resurrects it from memory.
-4. **Offline Terminal Triage Console:**
-   - If network exfiltration to the central SOC server is severed, the agent automatically falls back to an interactive, color-coded terminal triage display on the DC console, outputting the AD Health Score and ready-to-paste emergency PowerShell remediation scripts.
-5. **Real-Time SOC Threat Hunting Dashboard:**
-   - Central multi-threaded receiver and interactive web console showing live domain rosters, registry security state, detected anomalies, MITRE ATT&CK mappings, and one-click panic remediation.
 
 ---
 
@@ -126,11 +129,16 @@ python3 ad_server/app.py
 - **Interactive Single-Page UI:** `http://localhost:8000`
 
 ### 4. Deploy to Domain Controller
+Launch with interactive terminal triage and built-in local web dashboard:
 ```cmd
-agent_alpha.exe -alpha -server <CENTRAL_SERVER_IP> -port 8000 -interval 300
+agent_alpha.exe -alpha -debug
 ```
-- Telemetry polls and synchronizes every **5 minutes (300s)**.
-- If the central server is disconnected, the agent renders the full offline triage report directly to the local command prompt.
+- **Local Web Dashboard:** Navigate to `http://127.0.0.1:8000/` in Edge/Chrome on the DC to inspect live threat cards and execute 1-click remediation.
+- **Simultaneous Terminal Triage:** Live color-coded report prints to the console on every 5-minute (300s) audit round.
+- **Optional Central SOC Exfiltration:** If connecting to a remote central monitoring server:
+  ```cmd
+  agent_alpha.exe -alpha -server <CENTRAL_SERVER_IP> -port 8000 -interval 300 -debug
+  ```
 
 ---
 
